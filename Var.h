@@ -3,8 +3,8 @@
 #include <math.h>
 
 typedef struct Node {
-    double weights[2];
-    double depends_on[2];
+    std::vector<double> weights = std::vector<double>();
+    std::vector<double> depends_on = std::vector<double>();
 } Node;
 
 struct Grad {
@@ -22,10 +22,10 @@ int len(Tape* tape) {
 int push0(Tape* tape) {
     int len = tape->nodes.size();
     Node node;
-    node.depends_on[0] = len;
-    node.depends_on[1] = len;
-    node.weights[0] = 0;
-    node.weights[1] = 0;
+    node.depends_on.push_back(len);
+    node.depends_on.push_back(len);
+    node.weights.push_back(0);
+    node.weights.push_back(0);
     tape->nodes.push_back(node);
     return len;
 }
@@ -33,10 +33,10 @@ int push0(Tape* tape) {
 int push1(Tape* tape, int deps, double weight) {
     int len = tape->nodes.size();
     Node node;
-    node.depends_on[0] = deps;
-    node.depends_on[1] = len;
-    node.weights[0] = weight;
-    node.weights[1] = 0;
+    node.depends_on.push_back(deps);
+    node.depends_on.push_back(len);
+    node.weights.push_back(weight);
+    node.weights.push_back(0);
     tape->nodes.push_back(node);
     return len;
 }
@@ -44,10 +44,10 @@ int push1(Tape* tape, int deps, double weight) {
 int push2(Tape* tape,int deps0, double weight0, int deps1, double weight1) {
     int len = tape->nodes.size();
     Node node;
-    node.depends_on[0] = deps0;
-    node.depends_on[1] = deps1;
-    node.weights[0] = weight0;
-    node.weights[1] = weight1;
+    node.depends_on.push_back(deps0);
+    node.depends_on.push_back(deps1);
+    node.weights.push_back(weight0);
+    node.weights.push_back(weight1);
     tape->nodes.push_back(node);
     return len;
 }
@@ -83,9 +83,14 @@ public:
         for (int i = derivs.size()-1; i > -1; i--) {
             Node node = nodes[i];
             double deriv = derivs[i];
-            for (int j = 0; j < 2; j++){
+            // Assumption max two inputs
+            // for (int j = 0; j < 2; j++){
+            //     // derivs[node.depends_on[j]] += node.weights[j] * deriv;
+            // }
+            for (auto j = 0; j < node.depends_on.size(); j++){
                 derivs[node.depends_on[j]] += node.weights[j] * deriv;
             }
+
         }
         
         this->derivs = derivs;
