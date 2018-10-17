@@ -3,8 +3,8 @@
 #include <math.h>
 
 typedef struct Node {
-    std::vector<double> weights = std::vector<double>();
-    std::vector<double> depends_on = std::vector<double>();
+    std::vector<double> weights = std::vector<double> ();
+    std::vector<double> depends_on = std::vector<double> ();
 } Node;
 
 struct Grad {
@@ -83,14 +83,9 @@ public:
         for (int i = derivs.size()-1; i > -1; i--) {
             Node node = nodes[i];
             double deriv = derivs[i];
-            // Assumption max two inputs
-            // for (int j = 0; j < 2; j++){
-            //     // derivs[node.depends_on[j]] += node.weights[j] * deriv;
-            // }
             for (auto j = 0; j < node.depends_on.size(); j++){
                 derivs[node.depends_on[j]] += node.weights[j] * deriv;
             }
-
         }
         
         this->derivs = derivs;

@@ -12,7 +12,7 @@ int main()
     Var z = x * y + x.sin();
     z.grad();
 
-    std::cout << z.value << " should be " << "2.5794" << "\n";
+    std::cout << z.value << " should be " << 0.5*4.2 + std::sin(0.5) << "\n";
     std::cout << z.wrt(x) << " should be " << y.value + cos(x.value) << "\n";
     std::cout << z.wrt(y) << " should be " << x.value << "\n";
     std::cout << z.wrt(p) << " should be 0" << "\n";
