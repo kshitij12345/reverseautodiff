@@ -2,18 +2,26 @@
 #include <vector>
 #include <math.h>
 
+typedef std::vector<double> Grad;
+
+// Node holds the information
+// on which node/s does this
+// node depend on. Add their
+// weight/s by which the gradient
+// will be backpropped.
 typedef struct Node {
     std::vector<double> weights = std::vector<double> ();
-    std::vector<double> depends_on = std::vector<double> ();
+    std::vector<long> depends_on = std::vector<long> ();
 } Node;
 
-struct Grad {
-    std::vector<double> derivs;
-};
-
+// Tape records the computations.
+// Each node depends on previously
+// computed node/s.
 struct Tape {
     std::vector<Node> nodes;
 };
+
+/********* Helper Functions to record on Tape *********/
 
 int push0(Tape* tape) {
     int len = tape->nodes.size();
@@ -48,30 +56,37 @@ int push2(Tape* tape,int deps0, double weight0, int deps1, double weight1) {
     return len;
 }
 
+/*******************************************************/
+
+// Structure which holds actual data.
 struct Tensor {
 
 public:
     Tape* tape;
     int index;
     double value;
-    std::vector<double> derivs;
+    Grad derivs;
 
+    // Constructors
     Tensor() {};
     Tensor(Tape* tape, int index, double value) : tape(tape), index(index), value(value) {
     };
 
-    void Tensor::root(Tape* tape, double value) {
+    // make this tensor as root variable
+    void root(Tape* tape, double value) {
         this->tape = tape;
         this->index = tape->nodes.size();
         this->value = value;
         push0(tape);
         }
 
+    // gradient this tensor wrt x
     double wrt(Tensor x){
         return this->derivs[x.index];
     }
 
-    void Tensor::grad() {
+    // Compute gradient from this Tensor
+    void grad() {
         int length = this->tape->nodes.size();
         std::vector<Node> nodes = this->tape->nodes;
         std::vector<double>derivs(length);
@@ -87,34 +102,33 @@ public:
         this->derivs = derivs;
     };
 
-    /* Operations */
-
-    Tensor Tensor::sin() {
+    /* Operations that are recorded on Tape */
+    Tensor sin() {
         int ind = push1(this->tape, this->index, std::cos(this->value));
         return Tensor(this->tape, ind, std::sin(this->value));
     }
 
-    Tensor Tensor::cos() {
+    Tensor cos() {
         int ind = push1(this->tape, this->index, -std::sin(this->value));
         return Tensor(this->tape, ind, std::cos(this->value));
     }
 
-    Tensor Tensor::operator +(Tensor other) {
+    Tensor operator +(Tensor other) {
         int ind = push2(this->tape, this->index, 1.0, other.index, 1.0);
         return Tensor(this->tape, ind, this->value + other.value);
     }
 
-    Tensor Tensor::operator -(Tensor other) {
+    Tensor operator -(Tensor other) {
         int ind = push2(this->tape, this->index, 1.0, other.index, 1.0);
         return Tensor(this->tape, ind, this->value - other.value);
     }
 
-    Tensor Tensor::operator *(Tensor other) {
+    Tensor operator *(Tensor other) {
         int ind = push2(this->tape, this->index, other.value, other.index, this->value);
         return Tensor(this->tape, ind, this->value * other.value);
     }
 
-    Tensor Tensor::operator /(Tensor other) {
+    Tensor operator /(Tensor other) {
         int ind = push2(this->tape, this->index, 1/other.value, other.index, this->value);
         return Tensor(this->tape, ind, this->value / other.value);
     }
