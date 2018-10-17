@@ -31,6 +31,17 @@ void test_cos(){
     assert(z.wrt(x) == -std::sin(x.value));
 }
 
+void test_pow(){
+    Tape tape;
+    double ten = 10;
+    Tensor x = Tensor();
+    x.root(&tape, 0.5);
+    Tensor z = x.pow(ten);
+    z.grad();
+
+    assert(z.wrt(x) == ten * std::pow(x.value, ten - 1));
+}
+
 void test_expr(){
     Tape tape;
     Tensor x = Tensor();
@@ -54,6 +65,7 @@ int main()
     test_log();
     test_cos();
     test_sin();
+    test_pow();
     test_expr();
     std::cout << "Success\n";
     return 0;

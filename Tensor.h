@@ -113,6 +113,11 @@ public:
         return Tensor(this->tape, ind, std::log(this->value));
     }
 
+    Tensor pow(double power) {
+        int ind = push1(this->tape, this->index, power * std::pow(this->value, power - 1));
+        return Tensor(this->tape, ind, std::pow(this->value, power));
+    }
+
     Tensor cos() {
         int ind = push1(this->tape, this->index, -std::sin(this->value));
         return Tensor(this->tape, ind, std::cos(this->value));
