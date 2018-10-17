@@ -1,8 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
-// #include "Eigen/Core"
-// #include "Eigen/Dense"
 
 typedef struct Node {
     std::vector<double> weights = std::vector<double> ();
@@ -16,10 +14,6 @@ struct Grad {
 struct Tape {
     std::vector<Node> nodes;
 };
-
-int len(Tape* tape) {
-        return tape->nodes.size();
-    }
 
 int push0(Tape* tape) {
     int len = tape->nodes.size();
@@ -59,19 +53,17 @@ struct Tensor {
 public:
     Tape* tape;
     int index;
-    float value;
+    double value;
     std::vector<double> derivs;
-    //Eigen::MatrixXd mat = Eigen::MatrixXd(1,1); 
 
     Tensor() {};
-    Tensor(Tape* tape, int index, float value) : tape(tape), index(index), value(value) {
+    Tensor(Tape* tape, int index, double value) : tape(tape), index(index), value(value) {
     };
 
     void Tensor::root(Tape* tape, double value) {
         this->tape = tape;
         this->index = tape->nodes.size();
         this->value = value;
-        //this->mat(0,0) = value;
         push0(tape);
         }
 
@@ -80,7 +72,7 @@ public:
     }
 
     void Tensor::grad() {
-        int length = len(this->tape);
+        int length = this->tape->nodes.size();
         std::vector<Node> nodes = this->tape->nodes;
         std::vector<double>derivs(length);
         derivs[this->index] = 1.0;
