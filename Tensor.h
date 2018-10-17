@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+// #include "Eigen/Core"
+// #include "Eigen/Dense"
 
 typedef struct Node {
     std::vector<double> weights = std::vector<double> ();
@@ -52,30 +54,32 @@ int push2(Tape* tape,int deps0, double weight0, int deps1, double weight1) {
     return len;
 }
 
-struct Var {
+struct Tensor {
 
 public:
     Tape* tape;
     int index;
     float value;
     std::vector<double> derivs;
+    //Eigen::MatrixXd mat = Eigen::MatrixXd(1,1); 
 
-    Var() {};
-    Var(Tape* tape, int index, float value) : tape(tape), index(index), value(value) {
+    Tensor() {};
+    Tensor(Tape* tape, int index, float value) : tape(tape), index(index), value(value) {
     };
 
-    void Var::root_var(Tape* tape, double value) {
+    void Tensor::root(Tape* tape, double value) {
         this->tape = tape;
         this->index = tape->nodes.size();
         this->value = value;
+        //this->mat(0,0) = value;
         push0(tape);
         }
 
-    double wrt(Var x){
+    double wrt(Tensor x){
         return this->derivs[x.index];
     }
 
-    void Var::grad() {
+    void Tensor::grad() {
         int length = len(this->tape);
         std::vector<Node> nodes = this->tape->nodes;
         std::vector<double>derivs(length);
@@ -93,34 +97,34 @@ public:
 
     /* Operations */
 
-    Var Var::sin() {
+    Tensor Tensor::sin() {
         int ind = push1(this->tape, this->index, std::cos(this->value));
-        return Var(this->tape, ind, std::sin(this->value));
+        return Tensor(this->tape, ind, std::sin(this->value));
     }
 
-    Var Var::cos() {
+    Tensor Tensor::cos() {
         int ind = push1(this->tape, this->index, -std::sin(this->value));
-        return Var(this->tape, ind, std::cos(this->value));
+        return Tensor(this->tape, ind, std::cos(this->value));
     }
 
-    Var Var::operator +(Var other) {
+    Tensor Tensor::operator +(Tensor other) {
         int ind = push2(this->tape, this->index, 1.0, other.index, 1.0);
-        return Var(this->tape, ind, this->value + other.value);
+        return Tensor(this->tape, ind, this->value + other.value);
     }
 
-    Var Var::operator -(Var other) {
+    Tensor Tensor::operator -(Tensor other) {
         int ind = push2(this->tape, this->index, 1.0, other.index, 1.0);
-        return Var(this->tape, ind, this->value - other.value);
+        return Tensor(this->tape, ind, this->value - other.value);
     }
 
-    Var Var::operator *(Var other) {
+    Tensor Tensor::operator *(Tensor other) {
         int ind = push2(this->tape, this->index, other.value, other.index, this->value);
-        return Var(this->tape, ind, this->value * other.value);
+        return Tensor(this->tape, ind, this->value * other.value);
     }
 
-    Var Var::operator /(Var other) {
+    Tensor Tensor::operator /(Tensor other) {
         int ind = push2(this->tape, this->index, 1/other.value, other.index, this->value);
-        return Var(this->tape, ind, this->value / other.value);
+        return Tensor(this->tape, ind, this->value / other.value);
     }
 
 };

@@ -1,16 +1,16 @@
-#include "Var.h"
+#include "Tensor.h"
 #include <assert.h>
 
 int main()
 {
     Tape tape;
-    Var x = Var();
-    x.root_var(&tape, 0.5);
-    Var y = Var();
-    y.root_var(&tape, 4.2);
-    Var p = Var();
-    p.root_var(&tape, 4.2);
-    Var z = x * y + x.sin();
+    Tensor x = Tensor();
+    x.root(&tape, 0.5);
+    Tensor y = Tensor();
+    y.root(&tape, 4.2);
+    Tensor p = Tensor();
+    p.root(&tape, 4.2);
+    Tensor z = x * y + x.sin();
     z.grad();
 
     assert(z.value  == x.value*y.value + std::sin(x.value));
