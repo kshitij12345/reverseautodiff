@@ -108,6 +108,11 @@ public:
         return Tensor(this->tape, ind, std::sin(this->value));
     }
 
+    Tensor log() {
+        int ind = push1(this->tape, this->index, 1.0/this->value);
+        return Tensor(this->tape, ind, std::log(this->value));
+    }
+
     Tensor cos() {
         int ind = push1(this->tape, this->index, -std::sin(this->value));
         return Tensor(this->tape, ind, std::cos(this->value));
