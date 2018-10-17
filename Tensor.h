@@ -86,11 +86,11 @@ public:
     }
 
     // Compute gradient from this Tensor
-    void grad() {
+    void grad(double seed = 1.0) {
         int length = this->tape->nodes.size();
         std::vector<Node> nodes = this->tape->nodes;
         std::vector<double>derivs(length);
-        derivs[this->index] = 1.0;
+        derivs[this->index] = seed;
         for (int i = derivs.size()-1; i > -1; i--) {
             Node node = nodes[i];
             double deriv = derivs[i];
@@ -108,6 +108,11 @@ public:
         return Tensor(this->tape, ind, std::sin(this->value));
     }
 
+    Tensor cos() {
+        int ind = push1(this->tape, this->index, -std::sin(this->value));
+        return Tensor(this->tape, ind, std::cos(this->value));
+    }
+
     Tensor log() {
         int ind = push1(this->tape, this->index, 1.0/this->value);
         return Tensor(this->tape, ind, std::log(this->value));
@@ -116,11 +121,6 @@ public:
     Tensor pow(double power) {
         int ind = push1(this->tape, this->index, power * std::pow(this->value, power - 1));
         return Tensor(this->tape, ind, std::pow(this->value, power));
-    }
-
-    Tensor cos() {
-        int ind = push1(this->tape, this->index, -std::sin(this->value));
-        return Tensor(this->tape, ind, std::cos(this->value));
     }
 
     Tensor operator +(Tensor other) {
