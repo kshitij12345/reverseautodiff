@@ -64,12 +64,12 @@ public:
     Var(Tape* tape, int index, float value) : tape(tape), index(index), value(value) {
     };
 
-    void Var::root_var(Tape* tape, int index,double value) {
-        push0(tape);
+    void Var::root_var(Tape* tape, double value) {
         this->tape = tape;
-        this->index = index;
+        this->index = tape->nodes.size();
         this->value = value;
-    }
+        push0(tape);
+        }
 
     double wrt(Var x){
         return this->derivs[x.index];

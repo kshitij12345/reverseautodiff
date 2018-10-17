@@ -1,22 +1,24 @@
 #include "Var.h"
+#include <assert.h>
 
 int main()
 {
     Tape tape;
     Var x = Var();
-    x.root_var(&tape, tape.nodes.size(), 0.5);
+    x.root_var(&tape, 0.5);
     Var y = Var();
-    y.root_var(&tape, tape.nodes.size(), 4.2);
+    y.root_var(&tape, 4.2);
     Var p = Var();
-    p.root_var(&tape, tape.nodes.size(), 4.2);
+    p.root_var(&tape, 4.2);
     Var z = x * y + x.sin();
     z.grad();
 
-    std::cout << z.value << " should be " << 0.5*4.2 + std::sin(0.5) << "\n";
-    std::cout << z.wrt(x) << " should be " << y.value + cos(x.value) << "\n";
-    std::cout << z.wrt(y) << " should be " << x.value << "\n";
-    std::cout << z.wrt(p) << " should be 0" << "\n";
-    
+    assert(z.value  == x.value*y.value + std::sin(x.value));
+    assert(z.wrt(x) == y.value + cos(x.value));
+    assert(z.wrt(y) == x.value);
+    assert(z.wrt(p) == 0);
+
+    std::cout << "Success\n";
     return 0;
 }
 
