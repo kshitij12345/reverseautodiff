@@ -7,7 +7,6 @@ typedef struct Node {
     double depends_on[2];
 } Node;
 
-class Var;
 struct Grad {
     std::vector<double> derivs;
 };
@@ -94,14 +93,14 @@ public:
 
     /* Operations */
 
-    Var Var::sin_var() {
-        int ind = push1(this->tape, this->index, cos(this->value));
-        return Var(this->tape, ind, sin(this->value));
+    Var Var::sin() {
+        int ind = push1(this->tape, this->index, std::cos(this->value));
+        return Var(this->tape, ind, std::sin(this->value));
     }
 
-    Var Var::cos_var() {
-        int ind = push1(this->tape, this->index, -sin(this->value));
-        return Var(this->tape, ind, cos(this->value));
+    Var Var::cos() {
+        int ind = push1(this->tape, this->index, -std::sin(this->value));
+        return Var(this->tape, ind, std::cos(this->value));
     }
 
     Var Var::operator +(Var other) {
