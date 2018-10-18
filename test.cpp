@@ -2,62 +2,61 @@
 #include <assert.h>
 
 void test_log(){
-    Tape tape;
-    Tensor x = Tensor();
+    Tape<double> tape;
+    auto x = Tensor<double>();
     x.root(&tape, 0.5);
-    Tensor z = x.log();
+    auto z = x.log();
     z.grad();
 
     assert(z.wrt(x) == 1.0/x.value);
 }
 
 void test_sin(){
-    Tape tape;
-    Tensor x = Tensor();
+    Tape<double> tape;
+    auto x = Tensor<double>();
     x.root(&tape, 0.5);
-    Tensor z = x.sin();
+    auto z = x.sin();
     z.grad();
 
     assert(z.wrt(x) == std::cos(x.value));
 }
 
 void test_cos(){
-    Tape tape;
-    Tensor x = Tensor();
+    Tape<double> tape;
+    auto x = Tensor<double>();
     x.root(&tape, 0.5);
-    Tensor z = x.cos();
+    auto z = x.cos();
     z.grad();
 
     assert(z.wrt(x) == -std::sin(x.value));
 }
 
 void test_pow(){
-    Tape tape;
+    Tape<double> tape;
     double ten = 10;
-    Tensor x = Tensor();
+    auto x = Tensor<double>();
     x.root(&tape, 0.5);
-    Tensor z = x.pow(ten);
+    auto z = x.pow(ten);
     z.grad();
 
     assert(z.wrt(x) == ten * std::pow(x.value, ten - 1));
 }
 
 void test_expr(){
-    Tape tape;
-    Tensor x = Tensor();
+    Tape<double> tape;
+    auto x = Tensor<double>();
     x.root(&tape, 0.5);
-    Tensor y = Tensor();
+    auto y = Tensor<double>();
     y.root(&tape, 4.2);
-    Tensor p = Tensor();
+    auto p = Tensor<double>();
     p.root(&tape, 4.2);
-    Tensor z = x * y.sin() + x.log();
+    auto z = x * y.sin() + x.log();
     z.grad();
 
     assert(z.value  == x.value*std::sin(y.value) + std::log(x.value));
     assert(z.wrt(x) == std::sin(y.value) + 1.0/x.value);
     assert(z.wrt(y) == x.value*std::cos(y.value));
     assert(z.wrt(p) == 0); // sanity check.
-
 }
 
 int main()
