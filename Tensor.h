@@ -28,10 +28,6 @@ template <typename T>
 int push0(Tape<T>* tape) {
     int len = tape->nodes.size();
     Node<T> node;
-    node.depends_on.push_back(len);
-    node.depends_on.push_back(len);
-    node.weights.push_back(0);
-    node.weights.push_back(0);
     tape->nodes.push_back(node);
     return len;
 }
@@ -41,9 +37,7 @@ int push1(Tape<T>* tape, int deps, T weight) {
     int len = tape->nodes.size();
     Node<T> node;
     node.depends_on.push_back(deps);
-    node.depends_on.push_back(len);
     node.weights.push_back(weight);
-    node.weights.push_back(0);
     tape->nodes.push_back(node);
     return len;
 }
@@ -119,22 +113,22 @@ public:
     }
 
     Tensor<T> log() {
-        int ind = push1(this->tape, this->index, 1.0/this->value);
+        int ind = push1(this->tape, this->index, T(1.0)/this->value);
         return Tensor<T>(this->tape, ind, std::log(this->value));
     }
 
     Tensor<T> pow(double power) {
-        int ind = push1(this->tape, this->index, power * std::pow(this->value, power - 1));
+        int ind = push1(this->tape, this->index, T(power) * T(std::pow(this->value, power - 1)));
         return Tensor(this->tape, ind, std::pow(this->value, power));
     }
 
     Tensor<T> operator +(Tensor<T> other) {
-        int ind = push2(this->tape, this->index, 1.0, other.index, 1.0);
+        int ind = push2(this->tape, this->index, T(1.0), other.index, T(1.0));
         return Tensor<T>(this->tape, ind, this->value + other.value);
     }
 
     Tensor<T> operator -(Tensor<T> other) {
-        int ind = push2(this->tape, this->index, 1.0, other.index, 1.0);
+        int ind = push2(this->tape, this->index, T(1.0), other.index, T(1.0));
         return Tensor<T>(this->tape, ind, this->value - other.value);
     }
 
@@ -144,7 +138,7 @@ public:
     }
 
     Tensor<T> operator /(Tensor<T> other) {
-        int ind = push2(this->tape, this->index, 1/other.value, other.index, this->value);
+        int ind = push2(this->tape, this->index, T(1.0)/other.value, other.index, this->value);
         return Tensor<T>(this->tape, ind, this->value / other.value);
     }
 

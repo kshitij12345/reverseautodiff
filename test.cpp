@@ -1,19 +1,21 @@
 #include "Tensor.h"
 #include <assert.h>
 
+template <typename T>
 void test_log(){
-    Tape<double> tape;
-    auto x = Tensor<double>();
+    Tape<T> tape;
+    auto x = Tensor<T>();
     x.root(&tape, 0.5);
     auto z = x.log();
     z.grad();
 
-    assert(z.wrt(x) == 1.0/x.value);
+    assert(z.wrt(x) == T(1.0)/x.value);
 }
 
+template <typename T>
 void test_sin(){
-    Tape<double> tape;
-    auto x = Tensor<double>();
+    Tape<T> tape;
+    auto x = Tensor<T>();
     x.root(&tape, 0.5);
     auto z = x.sin();
     z.grad();
@@ -21,9 +23,10 @@ void test_sin(){
     assert(z.wrt(x) == std::cos(x.value));
 }
 
+template <typename T>
 void test_cos(){
-    Tape<double> tape;
-    auto x = Tensor<double>();
+    Tape<T> tape;
+    auto x = Tensor<T>();
     x.root(&tape, 0.5);
     auto z = x.cos();
     z.grad();
@@ -31,10 +34,11 @@ void test_cos(){
     assert(z.wrt(x) == -std::sin(x.value));
 }
 
+template <typename T>
 void test_pow(){
-    Tape<double> tape;
+    Tape<T> tape;
     double ten = 10;
-    auto x = Tensor<double>();
+    auto x = Tensor<T>();
     x.root(&tape, 0.5);
     auto z = x.pow(ten);
     z.grad();
@@ -42,30 +46,41 @@ void test_pow(){
     assert(z.wrt(x) == ten * std::pow(x.value, ten - 1));
 }
 
+template <typename T>
 void test_expr(){
-    Tape<double> tape;
-    auto x = Tensor<double>();
+    Tape<T> tape;
+    auto x = Tensor<T>();
     x.root(&tape, 0.5);
-    auto y = Tensor<double>();
+    auto y = Tensor<T>();
     y.root(&tape, 4.2);
-    auto p = Tensor<double>();
+    auto p = Tensor<T>();
     p.root(&tape, 4.2);
     auto z = x * y.sin() + x.log();
     z.grad();
 
     assert(z.value  == x.value*std::sin(y.value) + std::log(x.value));
-    assert(z.wrt(x) == std::sin(y.value) + 1.0/x.value);
+    assert(z.wrt(x) == std::sin(y.value) + T(1.0)/x.value);
     assert(z.wrt(y) == x.value*std::cos(y.value));
     assert(z.wrt(p) == 0); // sanity check.
 }
 
+template <typename T>
+struct Test{
+    void run_test(){
+        test_log<T>();
+        test_cos<T>();
+        test_sin<T>();
+        test_pow<T>();
+        test_expr<T>();
+    }
+};
+
 int main()
 {
-    test_log();
-    test_cos();
-    test_sin();
-    test_pow();
-    test_expr();
+    Test<double>().run_test();
+
+    Test<float>().run_test();
+
     std::cout << "Success\n";
     return 0;
 }
