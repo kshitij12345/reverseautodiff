@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 
 /********* Tape Structure *********************************/
@@ -106,7 +106,7 @@ public:
     }
 
     Tensor<DataType> operator -(Tensor<DataType> other) {
-        int ind = push2(this->tape, this->index, DataType(1.0), other.index, DataType(1.0));
+        int ind = push2(this->tape, this->index, DataType(1.0), other.index, DataType(-1.0));
         return Tensor<DataType>(this->tape, ind, this->value - other.value);
     }
 

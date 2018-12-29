@@ -66,8 +66,8 @@ void test_expr(){
     assert(z.value  == r.value * r.value * r.value);
     assert(z.wrt(r) == T(3) * std::pow(r.value, T(2)) );
     assert(z.wrt(p) == 0); // sanity check. 
-    assert( abs(z.wrt(y) - T(3) * T(std::pow(r.value, 2.0)) * (x.value * cos(y.value)) ) < 1e-15 );
-    assert( abs(z.wrt(x) - T(3) * T(std::pow(r.value, 2.0)) * ( sin(y.value) + (T(1.0)/x.value)) ) < 1e-15 );
+    assert( std::abs(z.wrt(y) - T(3) * T(std::pow(r.value, 2.0)) * (x.value * std::cos(y.value)) ) < 1e-15 );
+    assert( std::abs(z.wrt(x) - T(3) * T(std::pow(r.value, 2.0)) * ( std::sin(y.value) + (T(1.0)/x.value)) ) < 1e-15 );
 }
 
 template <typename T>
